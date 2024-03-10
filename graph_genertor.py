@@ -12,8 +12,11 @@ from spacy import displacy
 import networkx as nx
 import matplotlib.pyplot as plt
 from pyvis.network import Network
+import dotenv
+from dotenv import load_dotenv
+load_dotenv()
 
-GEMINI_API = "AIzaSyCgPS0MN1VzhcDYY4hgM5MHZqiGC1BEL1g"
+GEMINI_API = os.getenv('GEMINI_API')
 genai.configure(api_key=GEMINI_API)
 model = genai.GenerativeModel('gemini-pro')
 
@@ -142,13 +145,13 @@ if __name__ == "__main__":
 for index, row in df.iterrows():
     # Determine node color based on sentiment
     if row['sentiment'] == 'positive':
-        node_color = '#00ff00'  # Green for positive sentiment
+        node_color = '#7efc87'  # Green for positive sentiment
     elif row['sentiment'] == 'negative':
-        node_color = '#ff0000'  # Red for negative sentiment
+        node_color = '#f26363'  # Red for negative sentiment
     else:
-        node_color = '#0000ff'  # Blue for neutral sentiment
+        node_color = '#639af2'  # Blue for neutral sentiment
     
-    net.add_node(row['source'], label=row['source'], color='#ffcc00')  # Roadster Release node
+    net.add_node(row['source'], label=row['source'], color='#fcf47e')  # Roadster Release node
     net.add_node(row['destination'], label=row['destination'], color=node_color)  # Company nodes
     net.add_edge(row['source'], row['destination'], value=20)  # Connecting edge with value attribute
 
