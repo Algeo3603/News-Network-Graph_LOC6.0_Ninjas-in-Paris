@@ -12,17 +12,15 @@ from spacy import displacy
 import networkx as nx
 import matplotlib.pyplot as plt
 from pyvis.network import Network
-import dotenv
-from dotenv import load_dotenv
-load_dotenv()
 
-GEMINI_API = os.getenv('GEMINI_API')
+
+GEMINI_API = ""
 genai.configure(api_key=GEMINI_API)
 model = genai.GenerativeModel('gemini-pro')
 
 
 # load_dotenv()
-NEWS_API_KEY = "d19f7ff3b47f412e877621a4c5aee083"
+NEWS_API_KEY = ""
 
 def get_news_articles(keywords, financial_domains="financial-websites.com",language="en"):
   """
@@ -73,7 +71,7 @@ def get_news_articles(keywords, financial_domains="financial-websites.com",langu
     #   outfile.write(description)
     if (k % 10 == 0):
       # print(corpus)
-      response = model.generate_content(f"strictly only display the names of upto 5 entities such as company names/organizations etc and the label of their sentiment(either positive negative or neutral) in this format: entity, sentiment from the following news articles.  {corpus},i want it strictly in the above mentioned format, do not change it under any circumstance ,if you dont find any entity dont display a message saying the same , just send nothing back and move on to the next prompt")
+      response = model.generate_content(f"strictly only display the names of upto 10 entities such as company names/organizations etc and the label of their sentiment(either positive negative or neutral) in this format: entity, sentiment from the following news articles.  {corpus},i want it strictly in the above mentioned format, do not change it under any circumstance ,if you dont find any entity dont display a message saying the same , just send nothing back and move on to the next prompt")
       # response.resolve()
       # print(response.text)
       try:
@@ -99,7 +97,28 @@ def get_news_articles(keywords, financial_domains="financial-websites.com",langu
       corpus = ""
 
   # print(f"Successfully saved descriptions for {len(data['articles'])} articles.")
-  return jsondata
+  # return jsondata
+  data=jsondata
+  df = pd.DataFrame(data)
+  net = Network(notebook=True)
+
+  for index, row in df.iterrows():
+    # Determine node color based on sentiment
+    if row['sentiment'] == 'positive':
+        node_color = '#00ff00'  # Green for positive sentiment
+    elif row['sentiment'] == 'negative':
+        node_color = '#ff0000'  # Red for negative sentiment
+    else:
+        node_color = '#0000ff'  # Blue for neutral sentiment
+    
+    net.add_node(row['source'], label=row['source'], color='#ffcc00')  # Roadster Release node
+    net.add_node(row['destination'], label=row['destination'], color=node_color)  # Company nodes
+    net.add_edge(row['source'], row['destination'], value=20)  # Connecting edge with value attribute
+
+
+    # net.force_atlas_2based()
+   
+  net.show('graph.html')
 
 
 def see_url(keywords, financial_domains="finance"):
@@ -111,7 +130,7 @@ def see_url(keywords, financial_domains="finance"):
     financial_domains (optional): Comma-separated list of financial website domains (default: financial-websites.com).
   """
   # Replace with your actual News API key
-  api_key = "d19f7ff3b47f412e877621a4c5aee083"
+  api_key = "dcfc10e5cbf140f3ac15cd0c2a5bc047"
   base_url = "https://newsapi.org/v2/everything"
 
   # Construct the URL with user-entered keywords
@@ -131,32 +150,94 @@ def delete_text_files():
       os.remove(filename)
 
 
-if __name__ == "__main__":
-  # Get user input for keywords
-  keywords = input("Enter keywords related to the financial event: ")
+def get_news_articles2(keywords):
+  import appy as ap
+  jsondata = {
+      'source': [],
+      'destination': [],
+      'sentiment': []
+  }
+  text=ap.serp(keywords)
+  response = model.generate_content(f"strictly only display the names of upto 10 entities such as company names/organizations etc and the label of their sentiment(either positive negative or neutral) in this format: entity, sentiment from the following news articles.  {text},i want it strictly in the above mentioned format, do not change it under any circumstance ,if you dont find any entity dont display a message saying the same , just send nothing back and move on to the next prompt")
+  # print(response.text)
+  try:
+    res = response.text.split("\n")
+  except:
+    pass
+  # print(sus)
+  for r in res:
+    try:
+      aspect, senti = r.split(", ")
+      if aspect[0] == '-':
+        aspect = aspect[1:]
+      if '1' <= aspect[0] <= '5':
+        aspect = aspect[3:]
+      # print(aspect, senti)
+      aspect.lstrip().rstrip()
+      if aspect not in jsondata['destination']:
+        jsondata['source'].append(keywords)
+        jsondata['destination'].append(aspect)
+        jsondata['sentiment'].append(senti)
+    except:
+      pass
 
-  # Call the function to fetch and save articles
-  myjson = get_news_articles(keywords)
-  data=myjson
+  data=jsondata
   df = pd.DataFrame(data)
   net = Network(notebook=True)
 
-# Add nodes and edges to the network graph
-for index, row in df.iterrows():
+  for index, row in df.iterrows():
     # Determine node color based on sentiment
     if row['sentiment'] == 'positive':
-        node_color = '#7efc87'  # Green for positive sentiment
+        node_color = '#00ff00'  # Green for positive sentiment
     elif row['sentiment'] == 'negative':
-        node_color = '#f26363'  # Red for negative sentiment
+        node_color = '#ff0000'  # Red for negative sentiment
     else:
-        node_color = '#639af2'  # Blue for neutral sentiment
+        node_color = '#0000ff'  # Blue for neutral sentiment
     
-    net.add_node(row['source'], label=row['source'], color='#fcf47e')  # Roadster Release node
+    net.add_node(row['source'], label=row['source'], color='#ffcc00')  # Roadster Release node
     net.add_node(row['destination'], label=row['destination'], color=node_color)  # Company nodes
     net.add_edge(row['source'], row['destination'], value=20)  # Connecting edge with value attribute
 
-# Set the layout and save the graph
-net.force_atlas_2based()
-net.show(f'{keywords.replace(" ", "_")}.html')
+
+    # net.force_atlas_2based()
+    net.show('graph.html')  
+
+
+
+
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+  # Get user input for keywords
+  keywords = input("Enter keywords related to the financial event : ")
+
+  # Call the function to fetch and save articles
+
+  get_news_articles2(keywords)
+
+
+# Add nodes and edges to the network graph
+# for index, row in df.iterrows():
+#     # Determine node color based on sentiment
+#     if row['sentiment'] == 'positive':
+#         node_color = '#00ff00'  # Green for positive sentiment
+#     elif row['sentiment'] == 'negative':
+#         node_color = '#ff0000'  # Red for negative sentiment
+#     else:
+#         node_color = '#0000ff'  # Blue for neutral sentiment
+    
+#     net.add_node(row['source'], label=row['source'], color='#ffcc00')  # Roadster Release node
+#     net.add_node(row['destination'], label=row['destination'], color=node_color)  # Company nodes
+#     net.add_edge(row['source'], row['destination'], value=20)  # Connecting edge with value attribute
+
+# # Set the layout and save the graph
+# net.force_atlas_2based()
+# net.show(f'{keywords.replace(" ", "_")}.html')
 #   see_url(keywords)
 #   delete_text_files()
