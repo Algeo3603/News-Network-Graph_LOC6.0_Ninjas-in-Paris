@@ -1,0 +1,164 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#ffcc00", "id": "Paribas", "label": "Paribas", "shape": "dot"}, {"color": "#00ff00", "id": "Belfius", "label": "Belfius", "shape": "dot"}, {"color": "#00ff00", "id": "BNP Paribas Fortis", "label": "BNP Paribas Fortis", "shape": "dot"}, {"color": "#00ff00", "id": "ING", "label": "ING", "shape": "dot"}, {"color": "#00ff00", "id": "KBC", "label": "KBC", "shape": "dot"}, {"color": "#00ff00", "id": "Batopin", "label": "Batopin", "shape": "dot"}, {"color": "#00ff00", "id": "BNP Paribas Cardif", "label": "BNP Paribas Cardif", "shape": "dot"}, {"color": "#00ff00", "id": "AXA", "label": "AXA", "shape": "dot"}, {"color": "#ff0000", "id": "Soci\u00e9t\u00e9 G\u00e9n\u00e9rale", "label": "Soci\u00e9t\u00e9 G\u00e9n\u00e9rale", "shape": "dot"}, {"color": "#ff0000", "id": "Meta", "label": "Meta", "shape": "dot"}, {"color": "#ff0000", "id": "BNP Paribas", "label": "BNP Paribas", "shape": "dot"}, {"color": "#00ff00", "id": "Apple Pay", "label": "Apple Pay", "shape": "dot"}, {"color": "#00ff00", "id": "Groupement des cartes bancaires fran\u00e7ais", "label": "Groupement des cartes bancaires fran\u00e7ais", "shape": "dot"}, {"color": "#00ff00", "id": "JP Morgan", "label": "JP Morgan", "shape": "dot"}, {"color": "#00ff00", "id": "BNP Paribas Real Estate Transaction", "label": "BNP Paribas Real Estate Transaction", "shape": "dot"}, {"color": "#00ff00", "id": "XPerience.immo", "label": "XPerience.immo", "shape": "dot"}, {"color": "#00ff00", "id": "Wise-integration", "label": "Wise-integration", "shape": "dot"}, {"color": "#00ff00", "id": "Crelan", "label": "Crelan", "shape": "dot"}, {"color": "#ff0000", "id": "Axa Banque", "label": "Axa Banque", "shape": "dot"}, {"color": "#ff0000", "id": "Apple", "label": "Apple", "shape": "dot"}, {"color": "#0000ff", "id": "ADUx", "label": "ADUx", "shape": "dot"}, {"color": "#00ff00", "id": "BNP Paribas SA", "label": "BNP Paribas SA", "shape": "dot"}, {"color": "#00ff00", "id": "La Varappe", "label": "La Varappe", "shape": "dot"}, {"color": "#0000ff", "id": "Grande Halle de la Villette", "label": "Grande Halle de la Villette", "shape": "dot"}, {"color": "#0000ff", "id": "LA LETTRE", "label": "LA LETTRE", "shape": "dot"}, {"color": "#0000ff", "id": "SONY MUSIC", "label": "SONY MUSIC", "shape": "dot"}, {"color": "#ff0000", "id": "Orange Bank", "label": "Orange Bank", "shape": "dot"}, {"color": "#00ff00", "id": "Hello bank!", "label": "Hello bank!", "shape": "dot"}, {"color": "#ff0000", "id": "Orange", "label": "Orange", "shape": "dot"}, {"color": "#0000ff", "id": "Cetelem", "label": "Cetelem", "shape": "dot"}, {"color": "#00ff00", "id": "JVD", "label": "JVD", "shape": "dot"}, {"color": "#ff0000", "id": "TotalEnergies", "label": "TotalEnergies", "shape": "dot"}, {"color": "#00ff00", "id": "Hello Bank", "label": "Hello Bank", "shape": "dot"}, {"color": "#00ff00", "id": "Ukraine", "label": "Ukraine", "shape": "dot"}]);
+                  edges = new vis.DataSet([{"from": "Paribas", "to": "Belfius", "value": 20}, {"from": "Paribas", "to": "BNP Paribas Fortis", "value": 20}, {"from": "Paribas", "to": "ING", "value": 20}, {"from": "Paribas", "to": "KBC", "value": 20}, {"from": "Paribas", "to": "Batopin", "value": 20}, {"from": "Paribas", "to": "BNP Paribas Cardif", "value": 20}, {"from": "Paribas", "to": "AXA", "value": 20}, {"from": "Paribas", "to": "Soci\u00e9t\u00e9 G\u00e9n\u00e9rale", "value": 20}, {"from": "Paribas", "to": "Meta", "value": 20}, {"from": "Paribas", "to": "BNP Paribas", "value": 20}, {"from": "Paribas", "to": "Apple Pay", "value": 20}, {"from": "Paribas", "to": "Groupement des cartes bancaires fran\u00e7ais", "value": 20}, {"from": "Paribas", "to": "JP Morgan", "value": 20}, {"from": "Paribas", "to": "BNP Paribas Real Estate Transaction", "value": 20}, {"from": "Paribas", "to": "XPerience.immo", "value": 20}, {"from": "Paribas", "to": "Wise-integration", "value": 20}, {"from": "Paribas", "to": "Crelan", "value": 20}, {"from": "Paribas", "to": "Axa Banque", "value": 20}, {"from": "Paribas", "to": "Apple", "value": 20}, {"from": "Paribas", "to": "ADUx", "value": 20}, {"from": "Paribas", "to": "BNP Paribas SA", "value": 20}, {"from": "Paribas", "to": "La Varappe", "value": 20}, {"from": "Paribas", "to": "Grande Halle de la Villette", "value": 20}, {"from": "Paribas", "to": "LA LETTRE", "value": 20}, {"from": "Paribas", "to": "SONY MUSIC", "value": 20}, {"from": "Paribas", "to": "Orange Bank", "value": 20}, {"from": "Paribas", "to": "Hello bank!", "value": 20}, {"from": "Paribas", "to": "Orange", "value": 20}, {"from": "Paribas", "to": "Cetelem", "value": 20}, {"from": "Paribas", "to": "JVD", "value": 20}, {"from": "Paribas", "to": "TotalEnergies", "value": 20}, {"from": "Paribas", "to": "Hello Bank", "value": 20}, {"from": "Paribas", "to": "Ukraine", "value": 20}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "forceAtlas2Based": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.01,
+            "damping": 0.4,
+            "gravitationalConstant": -50,
+            "springConstant": 0.08,
+            "springLength": 100
+        },
+        "solver": "forceAtlas2Based",
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
